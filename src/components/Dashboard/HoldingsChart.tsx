@@ -1,82 +1,58 @@
 "use client";
 
-import { useState } from "react";
-import { generateHoldings, Holding } from "@/lib/data";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/UI/Card";
-import { BarChart as BarIcon, LineChart as LineIcon } from "lucide-react";
 import dynamic from "next/dynamic";
+import { useState, useEffect } from "react";
+import { useDateRange } from "@/context/DateRangeContext";
+import { generateHoldings } from "@/lib/data";
+import { Holding } from "@/lib/types";
+import { BarChart, LineChart } from "lucide-react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 
-// Dynamically import ApexCharts to avoid SSR issues
-const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
+const ApexChart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 export default function HoldingsChart(): JSX.Element {
+  const { range } = useDateRange();
   const [chartType, setChartType] = useState<"bar" | "line">("bar");
+  const [data, setData] = useState<Holding[]>([]);
 
-  const holdings: Holding[] = generateHoldings();
-  const categories = holdings.map((h) => h.month);
-  const values = holdings.map((h) => h.value);
+  useEffect(() => {
+    setData(generateHoldings(range));
+  }, [range]);
 
-  const chartOptions = {
-    chart: {
-      id: "holdings-chart",
-      toolbar: { show: false },
-      animations: {
-        easing: "easeinout",
-        speed: 600
-      }
-    },
-    xaxis: {
-      categories,
-      labels: { style: { colors: "#888" } }
-    },
-    yaxis: {
-      labels: { style: { colors: "#888" } }
-    },
-    stroke: {
-      curve: "smooth",
-      width: 3
-    },
-    markers: {
-      size: chartType === "line" ? 5 : 0,
-      colors: ["#f472b6"], // Tailwind pink-400
-      strokeColors: "#fff",
-      strokeWidth: 2
-    },
-    colors: ["#6366f1"], // Tailwind indigo-500
-    dataLabels: {
-      enabled: false
-    },
-    grid: {
-      borderColor: "#e5e7eb",
-      strokeDashArray: 4
-    }
-  };
-
-  const series = [
-    {
-      name: "Holdings",
-      data: values
-    }
-  ];
-
-  const toggleChartType = (): void => {
+  const toggleChartType = () => {
     setChartType((prev) => (prev === "bar" ? "line" : "bar"));
   };
 
+  const chartOptions = {
+    chart: { type: chartType },
+    xaxis: { categories: data.map((d) => d.month) },
+    stroke: { curve: "smooth" },
+    markers: { size: chartType === "line" ? 5 : 0 }
+  };
+
+  const chartSeries = [
+    {
+      name: "Holdings",
+      data: data.map((d) => d.value)
+    }
+  ];
+
   return (
-    <Card className="p-4 h-[500px]">
-      <CardHeader className="flex items-center justify-between">
-        <CardTitle className="text-base font-medium text-gray-600">Holdings Over Time</CardTitle>
-        <button
-          onClick={toggleChartType}
-          className="text-xs px-2 py-1 border rounded text-gray-600 hover:bg-gray-50 flex items-center gap-1"
-        >
-          {chartType === "bar" ? <LineIcon className="w-4 h-4" /> : <BarIcon className="w-4 h-4" />}
-          Toggle to {chartType === "bar" ? "Line" : "Bar"}
-        </button>
+    <Card>
+      <CardHeader>
+        <div className="flex justify-between items-center">
+          <CardTitle>Holdings Over Time</CardTitle>
+          <button onClick={toggleChartType}>
+            {chartType === "bar" ? (
+              <LineChart className="w-5 h-5 text-blue-500" />
+            ) : (
+              <BarChart className="w-5 h-5 text-green-600" />
+            )}
+          </button>
+        </div>
       </CardHeader>
-      <CardContent className="px-1">
-        <Chart options={chartOptions as any} series={series} type={chartType} height={400} />
+      <CardContent>
+        <ApexChart options={chartOptions} series={chartSeries} type={chartType} height={250} />
       </CardContent>
     </Card>
   );
