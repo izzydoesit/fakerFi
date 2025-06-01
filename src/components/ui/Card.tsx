@@ -28,7 +28,13 @@ export function CardHeader({
   children: ReactNode;
   className?: string;
 }): JSX.Element {
-  return <div className={`mb-2 flex items-center justify-between ${className}`}>{children}</div>;
+  return (
+    <div
+      className={`mb-2 flex flex-row items-center justify-between flex-nowrap gap-2 ${className}`}
+    >
+      {children}
+    </div>
+  );
 }
 
 export function CardTitle({ children }: { children: ReactNode }): JSX.Element {
