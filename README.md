@@ -40,9 +40,9 @@ npm run dev
 
 Fake data is generated in `/lib/data.ts` using `@faker-js/faker` for trades, balances, and holdings.
 
-## 📊 Demo
+## 🌐 Live Demo
 
-**Live on Vercel soon...**
+👉 [https://faker-fi.vercel.app](https://faker-fi.vercel.app)
 
 ## 🧠 Author
 
