@@ -43,8 +43,8 @@ export interface KYCInfo {
 }
 
 export interface DateRange {
-  from: Date;
-  to: Date;
+  from?: Date;
+  to?: Date;
 }
 
 export interface DateRangeContextProps {

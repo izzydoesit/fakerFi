@@ -1,5 +1,6 @@
 "use client";
 
+import type { JSX } from "react";
 import { CalendarDays, Download } from "lucide-react";
 import { format } from "date-fns";
 import { useRef, useState } from "react";
