@@ -18,7 +18,7 @@ export default function AccountSummary(): JSX.Element {
 
   return (
     <Card className="col-span-1 p-4">
-      <CardHeader className="flex flex-row items-center justify-between gap-2">
+      <CardHeader>
         <CardTitle className="text-base font-medium text-gray-600">Account Balance</CardTitle>
         <DollarSign className="w-5 h-5 text-gray-400 shrink-0" />
       </CardHeader>
