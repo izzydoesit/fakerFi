@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import AccountSummary from "./AccountSummary";
 import TradeSummary from "./TradeSummary";
+import RecentTransactions from "./RecentTransactions";
 import { motion } from "framer-motion";
 
 export default function Dashboard(): JSX.Element {
@@ -25,6 +26,7 @@ export default function Dashboard(): JSX.Element {
     >
       <AccountSummary />
       <TradeSummary />
+      <RecentTransactions />
     </motion.div>
   );
 }
