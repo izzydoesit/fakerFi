@@ -1,52 +1,33 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { getBalance, getKYCInfo } from "@/lib/data";
 import { useEffect, useState } from "react";
+import { DollarSign } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/UI/Card";
+import { getBalance } from "@/lib/data";
 
-export default function AccountSummary() {
+export default function AccountSummary(): JSX.Element {
   const [balance, setBalance] = useState(0);
-  const [kyc, setKyc] = useState({
-    name: "",
-    email: "",
-    status: "",
-    createdAt: ""
-  });
+  const [percentChange, setPercentChange] = useState(0);
 
   useEffect(() => {
     setBalance(getBalance());
-    setKyc(getKYCInfo());
+
+    const delta = parseFloat((Math.random() * 40 - 20).toFixed(1)); // simulate -20% to +20%
+    setPercentChange(delta);
   }, []);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Account Summary</CardTitle>
+    <Card className="col-span-1 p-4">
+      <CardHeader className="flex flex-row items-center justify-between gap-2">
+        <CardTitle className="text-base font-medium text-gray-600">Account Balance</CardTitle>
+        <DollarSign className="w-5 h-5 text-gray-400 shrink-0" />
       </CardHeader>
-      <CardContent className="space-y-4 text-sm">
-        <div>
-          <strong>Balance:</strong>{" "}
-          <span className="text-green-600 font-semibold">${balance.toLocaleString()}</span>
-        </div>
-        <div>
-          <strong>Name:</strong> {kyc.name}
-        </div>
-        <div>
-          <strong>Email:</strong> {kyc.email}
-        </div>
-        <div>
-          <strong>KYC Status:</strong>{" "}
-          <span
-            className={
-              kyc.status === "Verified"
-                ? "text-green-500"
-                : kyc.status === "Pending"
-                  ? "text-yellow-500"
-                  : "text-red-500"
-            }
-          >
-            {kyc.status}
-          </span>
+
+      <CardContent className="space-y-2 text-sm">
+        <div className="text-2xl font-semibold text-gray-800">${balance.toLocaleString()}</div>
+        <div className="text-xs text-gray-500">
+          {percentChange >= 0 ? "+" : ""}
+          {percentChange}% from last month
         </div>
       </CardContent>
     </Card>
