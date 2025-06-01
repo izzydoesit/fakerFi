@@ -7,17 +7,26 @@ import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import { useDateRange } from "@/context/DateRangeContext";
 import { generateTrades } from "@/lib/data";
+import type { DateRange } from "@/lib/types";
 import { motion } from "framer-motion";
 
 export default function TitleBar(): JSX.Element {
-  const { range, setRange } = useDateRange();
+  const { fromDate, toDate, setFromDate, setToDate } = useDateRange();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
 
   const formattedRange =
-    range.from && range.to
-      ? `${format(range.from, "MMM dd, yyyy")} - ${format(range.to, "MMM dd, yyyy")}`
+    fromDate && toDate
+      ? `${format(fromDate, "MMM dd, yyyy")} - ${format(toDate, "MMM dd, yyyy")}`
       : "Select range";
+
+  const handleRangeChange = (range: DateRange | undefined) => {
+    if (range?.from && range?.to) {
+      setFromDate(range.from);
+      setToDate(range.to);
+      setOpen(false);
+    }
+  };
 
   return (
     <div className="flex justify-between items-center py-4">
@@ -49,11 +58,8 @@ export default function TitleBar(): JSX.Element {
             <div className="absolute right-0 z-50 mt-2 bg-white border rounded shadow-lg p-4">
               <DayPicker
                 mode="range"
-                selected={range}
-                onSelect={(r) => {
-                  if (r?.from && r?.to) setOpen(false);
-                  setRange(r as { from: Date; to: Date });
-                }}
+                selected={{ from: fromDate, to: toDate }}
+                onSelect={handleRangeChange}
                 numberOfMonths={2}
               />
             </div>
@@ -66,11 +72,13 @@ export default function TitleBar(): JSX.Element {
           onClick={() => {
             const trades = generateTrades(30).filter((t) => {
               const date = new Date(t.date);
-              return date >= range.from && date <= range.to;
+              return fromDate && toDate && date >= fromDate && date <= toDate;
             });
+
             const header = "Asset,Type,Amount,Date";
             const rows = trades.map((t) => [t.asset, t.type, t.amount, t.date].join(","));
             const csv = [header, ...rows].join("\n");
+
             const blob = new Blob([csv], { type: "text/csv" });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
