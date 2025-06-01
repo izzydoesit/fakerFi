@@ -4,7 +4,7 @@ import type { JSX } from "react";
 import { useEffect, useState } from "react";
 import { DollarSign } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { getBalance } from "@/lib/data";
+import { getBalance, getPercentChange } from "@/lib/data";
 
 export default function AccountSummary(): JSX.Element {
   const [balance, setBalance] = useState(0);
@@ -13,7 +13,7 @@ export default function AccountSummary(): JSX.Element {
   useEffect(() => {
     setBalance(getBalance());
 
-    const delta = parseFloat((Math.random() * 40 - 20).toFixed(1)); // simulate -20% to +20%
+    const delta = getPercentChange();
     setPercentChange(delta);
   }, []);
 
