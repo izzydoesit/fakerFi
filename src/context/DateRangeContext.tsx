@@ -1,30 +1,25 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import type { DateRangeContextProps } from "@/lib/types";
+import { createContext, ReactNode, useContext, useState } from "react";
 
-export interface DateRange {
-  from: Date;
-  to: Date;
-}
+const DateRangeContext = createContext<DateRangeContextProps | undefined>(undefined);
 
-const defaultRange: DateRange = {
-  from: new Date(2025, 0, 1),
-  to: new Date(2025, 2, 30)
-};
+export function DateRangeProvider({ children }: { children: ReactNode }): JSX.Element {
+  const [fromDate, setFromDate] = useState<Date>(new Date("2025-01-01"));
+  const [toDate, setToDate] = useState<Date>(new Date("2025-03-30"));
 
-const DateRangeContext = createContext<{
-  range: DateRange;
-  setRange: (range: DateRange) => void;
-}>({
-  range: defaultRange,
-  setRange: () => {}
-});
-
-export function DateRangeProvider({ children }: { children: ReactNode }) {
-  const [range, setRange] = useState<DateRange>(defaultRange);
   return (
-    <DateRangeContext.Provider value={{ range, setRange }}>{children}</DateRangeContext.Provider>
+    <DateRangeContext.Provider value={{ fromDate, toDate, setFromDate, setToDate }}>
+      {children}
+    </DateRangeContext.Provider>
   );
 }
 
-export const useDateRange = () => useContext(DateRangeContext);
+export function useDateRange(): DateRangeContextProps {
+  const context = useContext(DateRangeContext);
+  if (!context) {
+    throw new Error("useDateRange must be used within a DateRangeProvider");
+  }
+  return context;
+}
