@@ -1,3 +1,26 @@
+import { ReactNode } from "react";
+
+export interface CardProps {
+  children: ReactNode;
+  className?: string;
+  scrollable?: boolean;
+}
+
+export interface CardHeaderProps {
+  children: ReactNode;
+  className?: string;
+}
+
+export interface CardTitleProps {
+  children: ReactNode;
+  className?: string;
+}
+
+export interface CardContentProps {
+  children: ReactNode;
+  className?: string;
+}
+
 export interface Trade {
   id: string;
   type: "buy" | "sell";
