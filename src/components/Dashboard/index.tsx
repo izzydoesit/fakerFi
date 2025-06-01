@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import AccountSummary from "./AccountSummary";
 import TradeSummary from "./TradeSummary";
@@ -9,18 +8,9 @@ import HoldingsChart from "./HoldingsChart";
 import RecentTransactions from "./RecentTransactions";
 
 export default function Dashboard(): JSX.Element {
-  const [refreshKey, setRefreshKey] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setRefreshKey((prev) => prev + 1);
-    }, 5000); // Refresh data every 5 seconds
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <motion.div
-      key={refreshKey}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
