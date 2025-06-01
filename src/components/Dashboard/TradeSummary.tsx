@@ -2,9 +2,10 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { useDateRange } from "@/context/DateRangeContext";
-import { generateTrades } from "@/lib/data";
+import { generateTrades, getPercentChange } from "@/lib/data";
 import { Trade } from "@/lib/types";
 import { Activity } from "lucide-react";
+import type { JSX } from "react";
 import { useMemo } from "react";
 
 export default function TradeSummary(): JSX.Element {
@@ -18,7 +19,7 @@ export default function TradeSummary(): JSX.Element {
   }, [fromDate, toDate]);
 
   const totalAmount = trades.reduce((acc, t) => acc + t.amount, 0);
-  const change = "+15.6% from last quarter"; // Placeholder
+  const percentChange = getPercentChange();
 
   return (
     <Card>
@@ -26,9 +27,13 @@ export default function TradeSummary(): JSX.Element {
         <CardTitle className="text-base font-medium text-gray-600">Trade Summary</CardTitle>
         <Activity className="w-5 h-5 text-indigo-500" />
       </CardHeader>
+
       <CardContent>
-        <p className="text-3xl font-semibold text-gray-800">${totalAmount.toFixed(2)}</p>
-        <p className="text-sm text-gray-500">{change}</p>
+        <p className="text-3xl font-semibold text-gray-800">${totalAmount.toLocaleString()}</p>
+        <p className="text-sm text-gray-500">
+          {percentChange >= 0 ? "+" : ""}
+          {percentChange}% from last quarter
+        </p>
       </CardContent>
     </Card>
   );
