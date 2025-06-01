@@ -4,12 +4,15 @@ import { motion } from "framer-motion";
 interface CardProps {
   children: ReactNode;
   className?: string;
+  scrollable?: boolean;
 }
 
-export function Card({ children, className = "" }: CardProps): JSX.Element {
+export function Card({ children, className = "", scrollable = false }: CardProps): JSX.Element {
   return (
     <motion.div
-      className={`rounded-lg border bg-white shadow p-4 ${className}`}
+      className={`rounded-lg border bg-white shadow p-4 relative ${
+        scrollable ? "max-h-[400px] overflow-y-auto" : ""
+      } ${className}`}
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
     >
