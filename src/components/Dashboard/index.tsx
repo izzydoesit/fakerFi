@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import AccountSummary from "./AccountSummary";
 import TradeSummary from "./TradeSummary";
 import RecentTransactions from "./RecentTransactions";
-import { motion } from "framer-motion";
+import HoldingsChart from "./HoldingsChart";
 
 export default function Dashboard(): JSX.Element {
   const [refreshKey, setRefreshKey] = useState(0);
@@ -26,6 +27,7 @@ export default function Dashboard(): JSX.Element {
     >
       <AccountSummary />
       <TradeSummary />
+      <HoldingsChart />
       <RecentTransactions />
     </motion.div>
   );
