@@ -18,3 +18,15 @@ export interface KYCInfo {
   status: "Verified" | "Pending" | "Rejected";
   createdAt: string;
 }
+
+export interface DateRange {
+  from: Date;
+  to: Date;
+}
+
+export interface DateRangeContextProps {
+  fromDate: Date;
+  toDate: Date;
+  setFromDate: (date: Date) => void;
+  setToDate: (date: Date) => void;
+}
