@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import AccountSummary from "./AccountSummary";
 import TradeSummary from "./TradeSummary";
+import KYCStatus from "./KYCStatus";
 import HoldingsChart from "./HoldingsChart";
 import RecentTransactions from "./RecentTransactions";
 
@@ -26,9 +27,10 @@ export default function Dashboard(): JSX.Element {
       className="space-y-6"
     >
       {/* Two columns at mobile and higher */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         <AccountSummary />
         <TradeSummary />
+        <KYCStatus />
       </div>
 
       {/* Two columns at mobile and higher */}
