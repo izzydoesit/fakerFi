@@ -93,8 +93,8 @@ export default function RecentTransactions(): JSX.Element {
   );
 
   return (
-    <Card className="col-span-1 xl:col-span-2 row-span-2">
-      <CardHeader className="flex flex-col gap-2">
+    <Card className="col-span-1">
+      <CardHeader className="sticky top-0 z-10 bg-white dark:bg-black">
         <div className="flex justify-between items-center">
           <CardTitle>Recent Transactions</CardTitle>
           <div className="flex gap-2">
@@ -137,7 +137,7 @@ export default function RecentTransactions(): JSX.Element {
         </div>
       </CardHeader>
 
-      <CardContent className="flex flex-col gap-3">
+      <CardContent className="pb-20">
         <ul className="space-y-1 min-h-[12rem]">
           <AnimatePresence mode="wait" initial={false}>
             {paginated.map((trade) => (
@@ -146,7 +146,7 @@ export default function RecentTransactions(): JSX.Element {
           </AnimatePresence>
         </ul>
 
-        <div className="flex justify-between items-center pt-3">
+        <div className="sticky bottom-0 z-10 bg-white dark:bg-black p-3 border-t">
           <button
             onClick={() => setPage((p) => Math.max(p - 1, 0))}
             disabled={page === 0}
