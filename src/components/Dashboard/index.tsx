@@ -6,6 +6,7 @@ import TradeSummary from "./TradeSummary";
 import KYCStatus from "./KYCStatus";
 import HoldingsChart from "./HoldingsChart";
 import RecentTransactions from "./RecentTransactions";
+import TitleBar from "./TitleBar";
 
 export default function Dashboard(): JSX.Element {
 
@@ -16,6 +17,8 @@ export default function Dashboard(): JSX.Element {
       transition={{ duration: 0.4 }}
       className="space-y-6"
     >
+      <TitleBar />
+      
       {/* Two columns at mobile and higher */}
      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <AccountSummary />
