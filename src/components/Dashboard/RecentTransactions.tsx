@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  DollarSign,
-  IndianRupee,
-  LayoutGrid,
-  Table,
-} from "lucide-react";
+import { DollarSign, IndianRupee, LayoutGrid, Table } from "lucide-react";
 import { useMemo, useState } from "react";
 import { generateTrades } from "@/lib/data";
 import { Trade } from "@/lib/types";
@@ -20,28 +15,23 @@ const PAGE_SIZE = 10;
 
 const iconMap: Record<Trade["type"], JSX.Element> = {
   buy: <DollarSign className="w-4 h-4 text-green-500" />,
-  sell: <IndianRupee className="w-4 h-4 text-red-500" />,
+  sell: <IndianRupee className="w-4 h-4 text-red-500" />
 };
 
 export default function RecentTransactions(): JSX.Element {
-  const { range } = useDateRange();
+  const { fromDate, toDate } = useDateRange();
   const [layout, setLayout] = useState<"grid" | "table">("grid");
   const [filter, setFilter] = useState<"all" | "buy" | "sell">("all");
 
-  const allTrades = useMemo(
-    () => generateTrades(30, range.from, range.to),
-    [range.from, range.to]
-  );
+  const allTrades = useMemo(() => generateTrades(30, fromDate, toDate), [fromDate, toDate]);
 
-  const filteredTrades = allTrades.filter(
-    (t) => filter === "all" || t.type === filter
-  );
+  const filteredTrades = allTrades.filter((t) => filter === "all" || t.type === filter);
 
   const {
     currentPageItems: paginatedTrades,
     currentPage,
     totalPages,
-    setPage,
+    setPage
   } = usePagination(filteredTrades, PAGE_SIZE);
 
   return (
@@ -105,9 +95,7 @@ export default function RecentTransactions(): JSX.Element {
                 {iconMap[trade.type]}
                 <div>
                   <div className="font-medium">{trade.asset}</div>
-                  <div className="text-xs text-gray-500">
-                    {formatDate(trade.date)}
-                  </div>
+                  <div className="text-xs text-gray-500">{formatDate(trade.date)}</div>
                 </div>
               </div>
               <div className="font-semibold">
@@ -129,9 +117,7 @@ export default function RecentTransactions(): JSX.Element {
             onPageChange={setPage}
           />
         )}
-        <div className="text-xs text-gray-400 text-right mt-2">
-          Last updated: just now
-        </div>
+        <div className="text-xs text-gray-400 text-right mt-2">Last updated: just now</div>
       </CardContent>
     </Card>
   );
