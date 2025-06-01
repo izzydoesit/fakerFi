@@ -21,8 +21,14 @@ export function Card({ children, className = "", scrollable = false }: CardProps
   );
 }
 
-export function CardHeader({ children }: { children: ReactNode }): JSX.Element {
-  return <div className="mb-2 font-bold text-lg">{children}</div>;
+export function CardHeader({
+  children,
+  className = ""
+}: {
+  children: ReactNode;
+  className?: string;
+}): JSX.Element {
+  return <div className={`mb-2 flex items-center justify-between ${className}`}>{children}</div>;
 }
 
 export function CardTitle({ children }: { children: ReactNode }): JSX.Element {
