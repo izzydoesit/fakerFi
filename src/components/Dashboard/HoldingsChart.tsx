@@ -1,5 +1,6 @@
 "use client";
 
+import type { JSX } from "react";
 import { useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { BarChart, LineChart } from "lucide-react";
@@ -45,13 +46,14 @@ export default function HoldingsChart(): JSX.Element {
           )}
         </Button>
       </CardHeader>
+
       <CardContent className="pb-4">
         <div className="w-full overflow-x-auto">
           <ApexChart
             type={chartType}
             height={300}
             options={{
-              chart: { toolbar: { show: false }, animations: { easing: "easeInOut", speed: 500 } },
+              chart: { toolbar: { show: false }, animations: { speed: 500 } },
               xaxis: { categories },
               stroke: { curve: "smooth" },
               markers: { size: chartType === "line" ? 4 : 0 }
@@ -61,7 +63,9 @@ export default function HoldingsChart(): JSX.Element {
         </div>
         <p className="text-muted-foreground text-sm mt-4">
           {hasValidDates
-            ? `Showing data from ${formatDate(fromDate)} to ${formatDate(toDate)}`
+            ? `Showing data from ${formatDate(fromDate.toISOString())} to ${formatDate(
+                toDate.toISOString()
+              )}`
             : "No data available for the selected range."}
         </p>
       </CardContent>
