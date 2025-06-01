@@ -27,6 +27,7 @@ export interface DateRange {
 export interface DateRangeContextProps {
   fromDate: Date;
   toDate: Date;
+  range: DateRange;
   setFromDate: (date: Date) => void;
   setToDate: (date: Date) => void;
 }
