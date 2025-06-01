@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import AccountSummary from "./AccountSummary";
 import TradeSummary from "./TradeSummary";
-import RecentTransactions from "./RecentTransactions";
 import HoldingsChart from "./HoldingsChart";
+import RecentTransactions from "./RecentTransactions";
 
 export default function Dashboard(): JSX.Element {
   const [refreshKey, setRefreshKey] = useState(0);
@@ -23,12 +23,19 @@ export default function Dashboard(): JSX.Element {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
+      className="space-y-6"
     >
-      <AccountSummary />
-      <TradeSummary />
-      <HoldingsChart />
-      <RecentTransactions />
+      {/* Two columns at mobile and higher */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <AccountSummary />
+        <TradeSummary />
+      </div>
+
+      {/* Two columns at mobile and higher */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <HoldingsChart />
+        <RecentTransactions />
+      </div>
     </motion.div>
   );
 }
