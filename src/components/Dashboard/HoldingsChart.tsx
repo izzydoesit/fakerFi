@@ -1,89 +1,69 @@
 "use client";
 
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  PointElement,
-  LineElement,
-  Tooltip,
-  Legend
-} from "chart.js";
-import { Bar, Line } from "react-chartjs-2";
+import { useState } from "react";
 import { generateHoldings, Holding } from "@/lib/data";
-import { useEffect, useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/UI/Card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/UI/Card";
+import { BarChart as BarIcon, LineChart as LineIcon } from "lucide-react";
+import dynamic from "next/dynamic";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  PointElement,
-  LineElement,
-  Tooltip,
-  Legend
-);
-
-type ChartMode = "bar" | "line";
+// Dynamically import ApexCharts to avoid SSR issues
+const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 export default function HoldingsChart(): JSX.Element {
-  const [holdings, setHoldings] = useState<Holding[]>([]);
-  const [mode, setMode] = useState<ChartMode>("bar");
+  const [chartType, setChartType] = useState<"bar" | "line">("bar");
 
-  useEffect(() => {
-    setHoldings(generateHoldings());
-  }, []);
+  const holdings: Holding[] = generateHoldings();
 
-  const data = {
-    labels: holdings.map((h) => h.month),
-    datasets: [
-      {
-        label: "Portfolio Value ($)",
-        data: holdings.map((h) => h.value),
-        backgroundColor: "rgba(59, 130, 246, 0.5)", // Tailwind blue-500
-        borderColor: "rgba(59, 130, 246, 1)",
-        borderWidth: 2,
-        fill: true,
-        tension: 0.3,
-        pointRadius: 4
+  const categories = holdings.map((h) => h.month);
+  const values = holdings.map((h) => h.value);
+
+  const chartOptions = {
+    chart: {
+      id: "holdings-chart",
+      toolbar: { show: false },
+      animations: {
+        easing: "easeinout",
+        speed: 400
       }
-    ]
+    },
+    xaxis: {
+      categories,
+      labels: { style: { colors: "#888" } }
+    },
+    yaxis: {
+      labels: { style: { colors: "#888" } }
+    },
+    stroke: {
+      curve: "smooth"
+    },
+    colors: ["#4f46e5"]
   };
 
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: { display: false },
-      tooltip: { mode: "index" as const, intersect: false }
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        ticks: {
-          callback: (value: number) => `$${value.toLocaleString()}`
-        }
-      }
+  const series = [
+    {
+      name: "Holdings",
+      data: values
     }
+  ];
+
+  const toggleChartType = (): void => {
+    setChartType((prev) => (prev === "bar" ? "line" : "bar"));
   };
 
   return (
-    <Card className="col-span-1 xl:col-span-1 row-span-2">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Holdings Over Time</CardTitle>
+    <Card className="p-4 h-[500px]">
+      <CardHeader className="flex items-center justify-between">
+        <CardTitle className="text-base font-medium text-gray-600">Holdings Over Time</CardTitle>
         <button
-          onClick={() => setMode((m) => (m === "bar" ? "line" : "bar"))}
-          className="text-xs px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 transition"
+          onClick={toggleChartType}
+          className="text-xs px-2 py-1 border rounded text-gray-500 hover:bg-gray-100 flex items-center gap-1"
         >
-          Toggle to {mode === "bar" ? "Line" : "Bar"}
+          {chartType === "bar" ? <LineIcon className="w-4 h-4" /> : <BarIcon className="w-4 h-4" />}
+          Toggle to {chartType === "bar" ? "Line" : "Bar"}
         </button>
       </CardHeader>
-      <CardContent className="h-[300px]">
-        {mode === "bar" ? (
-          <Bar data={data} options={options} />
-        ) : (
-          <Line data={data} options={options} />
-        )}
+      <CardContent className="px-1">
+        <Chart options={chartOptions as any} series={series} type={chartType} height={400} />
       </CardContent>
     </Card>
   );
