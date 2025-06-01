@@ -1,18 +1,13 @@
-import { ReactNode } from "react";
 import { motion } from "framer-motion";
-
-interface CardProps {
-  children: ReactNode;
-  className?: string;
-  scrollable?: boolean;
-}
+import type { JSX } from "react";
+import type { CardContentProps, CardHeaderProps, CardProps, CardTitleProps } from "@/lib/types";
+import { cn } from "@/utils/helpers";
 
 export function Card({ children, className = "", scrollable = false }: CardProps): JSX.Element {
+  const scrollableClasses = scrollable ? "max-h-[400px] overflow-y-auto" : "";
   return (
     <motion.div
-      className={`rounded-lg border bg-white shadow p-4 relative ${
-        scrollable ? "max-h-[400px] overflow-y-auto" : ""
-      } ${className}`}
+      className={cn("rounded-lg border bg-white shadow p-4 relative", scrollableClasses, className)}
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
     >
@@ -21,26 +16,20 @@ export function Card({ children, className = "", scrollable = false }: CardProps
   );
 }
 
-export function CardHeader({
-  children,
-  className = ""
-}: {
-  children: ReactNode;
-  className?: string;
-}): JSX.Element {
+export function CardHeader({ children, className = "" }: CardHeaderProps): JSX.Element {
   return (
     <div
-      className={`mb-2 flex flex-row items-center justify-between flex-nowrap gap-2 ${className}`}
+      className={cn("mb-2 flex flex-row items-center justify-between flex-nowrap gap-2", className)}
     >
       {children}
     </div>
   );
 }
 
-export function CardTitle({ children }: { children: ReactNode }): JSX.Element {
-  return <h3 className="text-xl font-semibold">{children}</h3>;
+export function CardTitle({ children, className = "" }: CardTitleProps): JSX.Element {
+  return <h3 className={cn("text-xl, font-semibold", className)}>{children}</h3>;
 }
 
-export function CardContent({ children }: { children: ReactNode }): JSX.Element {
-  return <div className="text-sm text-gray-700 space-y-2">{children}</div>;
+export function CardContent({ children, className = "" }: CardContentProps): JSX.Element {
+  return <div className={cn("text-sm text-gray-700 space-y-2", className)}>{children}</div>;
 }
