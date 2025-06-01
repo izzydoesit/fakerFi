@@ -1,124 +1,139 @@
 "use client";
 
-import { DollarSign, IndianRupee, LayoutGrid, Table } from "lucide-react";
-import { useMemo, useState } from "react";
+import type { JSX } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { useDateRange } from "@/context/DateRangeContext";
 import { generateTrades } from "@/lib/data";
 import { Trade } from "@/lib/types";
+import { ArrowDownLeft, ArrowUpRight, LayoutGrid, Table } from "lucide-react";
+import { useMemo, useState } from "react";
 import { formatDate } from "@/utils/format";
-import { Card, CardContent, CardHeader } from "../ui/Card";
-import PaginationControls from "../ui/PaginationControls";
-import { useDateRange } from "@/context/DateRangeContext";
-import { motion } from "framer-motion";
 import { usePagination } from "@/hooks/usePagination";
+import { cn } from "@/utils/helpers";
 
-const PAGE_SIZE = 10;
-
-const iconMap: Record<Trade["type"], JSX.Element> = {
-  buy: <DollarSign className="w-4 h-4 text-green-500" />,
-  sell: <IndianRupee className="w-4 h-4 text-red-500" />
+const iconMap = {
+  buy: <ArrowUpRight className="w-4 h-4 text-green-500" />,
+  sell: <ArrowDownLeft className="w-4 h-4 text-red-500" />
 };
 
 export default function RecentTransactions(): JSX.Element {
-  const { fromDate, toDate } = useDateRange();
-  const [layout, setLayout] = useState<"grid" | "table">("grid");
+  const { range } = useDateRange();
+  const allTrades = useMemo(
+    () => generateTrades(30, range?.from, range?.to),
+    [range?.from, range?.to]
+  );
+
   const [filter, setFilter] = useState<"all" | "buy" | "sell">("all");
+  const [view, setView] = useState<"grid" | "table">("grid");
 
-  const allTrades = useMemo(() => generateTrades(30, fromDate, toDate), [fromDate, toDate]);
+  const filteredTrades = useMemo(() => {
+    return filter === "all" ? allTrades : allTrades.filter((t) => t.type === filter);
+  }, [filter, allTrades]);
 
-  const filteredTrades = allTrades.filter((t) => filter === "all" || t.type === filter);
-
+  const PAGE_SIZE = 10;
   const {
-    currentPageItems: paginatedTrades,
+    currentPageItems: paginatedData,
     currentPage,
     totalPages,
     setPage
-  } = usePagination(filteredTrades, PAGE_SIZE);
+  } = usePagination<Trade>(filteredTrades, PAGE_SIZE);
 
   return (
-    <Card className="relative h-[500px] flex flex-col">
-      {/* Sticky Header */}
-      <CardHeader className="sticky top-0 bg-white z-10 border-b">
-        <div className="flex justify-between items-center w-full">
-          <div className="text-xl font-semibold">Recent Transactions</div>
-          <div className="flex items-center gap-2 ml-auto">
-            <button
-              onClick={() => setLayout("grid")}
-              className={`text-gray-500 hover:text-black ${
-                layout === "grid" ? "font-semibold" : ""
-              }`}
-            >
-              <LayoutGrid className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => setLayout("table")}
-              className={`text-gray-500 hover:text-black ${
-                layout === "table" ? "font-semibold" : ""
-              }`}
-            >
-              <Table className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
+    <Card className="flex flex-col h-full">
+      <CardHeader className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between border-b py-2">
+        <CardTitle>Recent Transactions</CardTitle>
 
-        <div className="flex items-center justify-end my-2">
-          <div className="flex gap-2">
-            {["all", "buy", "sell"].map((f) => (
-              <button
-                key={f}
-                onClick={() => {
-                  setFilter(f as "all" | "buy" | "sell");
-                  setPage(1);
-                }}
-                className={`text-sm px-3 py-1 rounded border ${
-                  filter === f ? "bg-black text-white" : "text-gray-600"
-                }`}
-              >
-                {f[0].toUpperCase() + f.slice(1)}
-              </button>
-            ))}
-          </div>
+        <div className="flex items-center gap-2 ml-auto">
+          <button
+            onClick={() => setFilter("all")}
+            className={cn(
+              "text-sm px-2 py-1 rounded",
+              filter === "all" ? "bg-gray-800 text-white" : "text-gray-600 hover:bg-gray-100"
+            )}
+          >
+            All
+          </button>
+          <button
+            onClick={() => setFilter("buy")}
+            className={cn(
+              "text-sm px-2 py-1 rounded",
+              filter === "buy" ? "bg-gray-800 text-white" : "text-gray-600 hover:bg-gray-100"
+            )}
+          >
+            Buy
+          </button>
+          <button
+            onClick={() => setFilter("sell")}
+            className={cn(
+              "text-sm px-2 py-1 rounded",
+              filter === "sell" ? "bg-gray-800 text-white" : "text-gray-600 hover:bg-gray-100"
+            )}
+          >
+            Sell
+          </button>
+
+          <button
+            className={cn("p-1 rounded hover:bg-gray-100", view === "grid" && "bg-gray-100")}
+            onClick={() => setView("grid")}
+          >
+            <LayoutGrid className="w-4 h-4" />
+          </button>
+          <button
+            className={cn("p-1 rounded hover:bg-gray-100", view === "table" && "bg-gray-100")}
+            onClick={() => setView("table")}
+          >
+            <Table className="w-4 h-4" />
+          </button>
         </div>
       </CardHeader>
 
-      {/* Scrollable Content Area */}
-      <div className="flex-1 overflow-y-auto space-y-3 px-4 py-2">
-        {paginatedTrades.length > 0 ? (
-          paginatedTrades.map((trade) => (
-            <motion.div
-              key={trade.id}
-              className="flex justify-between items-center p-2 border rounded"
-              initial={{ opacity: 0, y: 5 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <div className="flex gap-3 items-center">
-                {iconMap[trade.type]}
-                <div>
-                  <div className="font-medium">{trade.asset}</div>
-                  <div className="text-xs text-gray-500">{formatDate(trade.date)}</div>
-                </div>
-              </div>
-              <div className="font-semibold">
-                {trade.type === "buy" ? "+" : "-"}${trade.amount.toFixed(2)}
-              </div>
-            </motion.div>
-          ))
-        ) : (
-          <div className="text-gray-500 text-sm text-center">No trades found</div>
-        )}
-      </div>
-
-      {/* Sticky Footer */}
-      <CardContent className="sticky bottom-0 bg-white z-10 border-t mt-auto pt-2">
-        {filteredTrades.length > PAGE_SIZE && (
-          <PaginationControls
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setPage}
-          />
-        )}
-        <div className="text-xs text-gray-400 text-right mt-2">Last updated: just now</div>
+      {/* Scrollable List */}
+      <CardContent className="overflow-y-auto flex-1 px-4 max-h-[18rem]">
+        {paginatedData.map((trade) => (
+          <div
+            key={trade.id}
+            className={cn(
+              "border-b py-2 text-sm",
+              view === "grid"
+                ? "grid grid-cols-5 gap-4 items-center"
+                : "grid grid-cols-3 gap-8 items-center"
+            )}
+          >
+            <div className="flex items-center gap-2">
+              {iconMap[trade.type]} {trade.asset}
+            </div>
+            <div className="text-gray-600">${trade.amount.toFixed(2)}</div>
+            <div className={cn("text-gray-500", view === "table" && "ml-9")}>
+              {formatDate(trade.date)}
+            </div>
+            {view === "grid" && (
+              <div className="text-gray-400 font-medium">{trade.id.slice(0, 8)}</div>
+            )}
+            {view === "grid" && <div className="text-green-600 font-medium">Completed</div>}
+          </div>
+        ))}
       </CardContent>
+
+      {/* Pagination */}
+      <div className="border-t px-4 py-2 flex justify-between items-center text-sm">
+        <span className="text-gray-500">
+          Page {currentPage} of {totalPages}
+        </span>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+            className="text-gray-700 px-2 py-1 border rounded hover:bg-gray-100"
+          >
+            Prev
+          </button>
+          <button
+            onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+            className="text-gray-700 px-2 py-1 border rounded hover:bg-gray-100"
+          >
+            Next
+          </button>
+        </div>
+      </div>
     </Card>
   );
 }
