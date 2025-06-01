@@ -18,10 +18,8 @@ export default function TradeSummary(): JSX.Element {
   return (
     <Card className="col-span-1 p-4">
       <CardHeader>
-        <div className="flex justify-between items-center">
-          <CardTitle>Trade Activity</CardTitle>
-          <Activity className="w-5 h-5 text-indigo-500" />
-        </div>
+        <CardTitle className="text-base font-medium text-gray-600">Trade Activity</CardTitle>
+        <Activity className="w-5 h-5 text-indigo-500" />
       </CardHeader>
 
       <CardContent className="space-y-2 text-sm">
