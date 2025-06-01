@@ -1,17 +1,15 @@
 import { faker } from "@faker-js/faker";
-import { DateRange } from "react-day-picker";
-import { Holding, KYCInfo, Trade } from "./types";
+import { addDays, isAfter, isBefore } from "date-fns";
+import { Trade, Holding, KYCInfo } from "./types";
 
 export const getBalance = (): number => parseFloat(faker.finance.amount(10000, 50000));
 
-export const generateTrades = (
-  count = 10,
-  from: Date = new Date("2025-01-01"),
-  to: Date = new Date("2025-03-30")
-): Trade[] => {
-  if (from > to) [from, to] = [to, from]; // Ensure valid range
-  return Array.from({ length: count }, (): Trade => {
-    const date = faker.date.between({ from, to });
+export const generateTrades = (count = 50, from?: Date, to?: Date): Trade[] =>
+  Array.from({ length: count }, (): Trade => {
+    const date = faker.date.between({
+      from: from ?? new Date("2025-01-01"),
+      to: to ?? new Date("2025-03-30")
+    });
     return {
       id: faker.string.uuid(),
       type: faker.helpers.arrayElement(["buy", "sell"]),
@@ -20,23 +18,27 @@ export const generateTrades = (
       date: date.toISOString()
     };
   });
+
+export const generateHoldings = (): Holding[] => {
+  const start = new Date("2025-01-01");
+  return Array.from({ length: 12 }, (_, i): Holding => {
+    const date = addDays(start, i * 7); // weekly data
+    return {
+      date: date.toISOString(),
+      month: date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric"
+      }),
+      value: faker.number.int({ min: 5000, max: 15000 })
+    };
+  });
 };
 
-export const generateHoldings = (range: DateRange): Holding[] => {
-  const data: Holding[] = [];
-
-  let current = new Date(range.from);
-  while (current <= range.to) {
-    data.push({
-      month: current.toLocaleString("default", { month: "short" }),
-      value: faker.number.int({ min: 5000, max: 15000 }),
-      date: new Date(current)
-    });
-    current.setMonth(current.getMonth() + 1);
-  }
-
-  return data;
-};
+export const getHoldingsInRange = (from: Date, to: Date): Holding[] =>
+  generateHoldings().filter((holding) => {
+    const holdingDate = new Date(holding.date);
+    return !isBefore(holdingDate, from) && !isAfter(holdingDate, to);
+  });
 
 export const getKYCInfo = (): KYCInfo => ({
   name: faker.person.fullName(),
