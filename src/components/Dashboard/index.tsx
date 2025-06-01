@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import AccountSummary from "./AccountSummary";
+import TradeSummary from "./TradeSummary";
 import { motion } from "framer-motion";
 
 export default function Dashboard(): JSX.Element {
@@ -23,6 +24,7 @@ export default function Dashboard(): JSX.Element {
       className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
     >
       <AccountSummary />
+      <TradeSummary />
     </motion.div>
   );
 }
