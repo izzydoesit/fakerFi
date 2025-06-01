@@ -10,7 +10,6 @@ export default function TradeSummary(): JSX.Element {
 
   useEffect(() => {
     const data = generateTrades(12);
-    setTrades(data);
     const volume = data.reduce((sum, trade) => sum + trade.amount, 0);
     setTotalVolume(volume);
   }, []);
@@ -18,18 +17,12 @@ export default function TradeSummary(): JSX.Element {
   return (
     <Card className="col-span-1 p-4">
       <CardHeader>
-        <CardTitle className="text-base font-medium text-gray-600">Trade Summary</CardTitle>
+        <CardTitle className="text-base font-medium text-gray-600">Trade Activity</CardTitle>
       </CardHeader>
 
       <CardContent className="space-y-2 text-sm">
         <div className="text-2xl font-semibold text-gray-800">${totalVolume.toFixed(2)}</div>
-        <ul className="text-xs text-gray-500 space-y-1">
-          {trades.slice(0, 3).map((trade) => (
-            <li key={trade.id}>
-              {trade.type.toUpperCase()} {trade.asset} – ${trade.amount.toFixed(2)}
-            </li>
-          ))}
-        </ul>
+        <div className="text-xs text-gray-500">12 trades recorded</div>
       </CardContent>
     </Card>
   );
