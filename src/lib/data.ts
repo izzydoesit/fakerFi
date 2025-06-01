@@ -1,24 +1,6 @@
 import { faker } from "@faker-js/faker";
-
-export interface Trade {
-  id: string;
-  type: "buy" | "sell";
-  asset: string;
-  amount: number;
-  date: string;
-}
-
-export interface Holding {
-  month: string;
-  value: number;
-}
-
-export interface KYCInfo {
-  name: string;
-  email: string;
-  status: "Verified" | "Pending" | "Rejected";
-  createdAt: string;
-}
+import { DateRange } from "react-day-picker";
+import { Holding, KYCInfo, Trade } from "./types";
 
 export const getBalance = (): number => parseFloat(faker.finance.amount(10000, 50000));
 
@@ -34,14 +16,21 @@ export const generateTrades = (count = 10): Trade[] =>
     })
   );
 
-export const generateHoldings = (): Holding[] =>
-  Array.from(
-    { length: 6 },
-    (): Holding => ({
-      month: faker.date.month({ context: "standalone" }),
-      value: faker.number.int({ min: 5000, max: 15000 })
-    })
-  );
+export const generateHoldings = (range: DateRange): Holding[] => {
+  const data: Holding[] = [];
+
+  let current = new Date(range.from);
+  while (current <= range.to) {
+    data.push({
+      month: current.toLocaleString("default", { month: "short" }),
+      value: faker.number.int({ min: 5000, max: 15000 }),
+      date: new Date(current)
+    });
+    current.setMonth(current.getMonth() + 1);
+  }
+
+  return data;
+};
 
 export const getKYCInfo = (): KYCInfo => ({
   name: faker.person.fullName(),
