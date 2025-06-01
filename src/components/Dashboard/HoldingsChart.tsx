@@ -1,58 +1,69 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import { useState, useEffect } from "react";
-import { useDateRange } from "@/context/DateRangeContext";
-import { generateHoldings } from "@/lib/data";
-import { Holding } from "@/lib/types";
+import { useMemo, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { BarChart, LineChart } from "lucide-react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
+import dynamic from "next/dynamic";
+import { Button } from "@/components/ui/Button";
+import { useDateRange } from "@/context/DateRangeContext";
+import { getHoldingsInRange } from "@/lib/data";
+import { formatDate } from "@/utils/format";
 
 const ApexChart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 export default function HoldingsChart(): JSX.Element {
-  const { range } = useDateRange();
   const [chartType, setChartType] = useState<"bar" | "line">("bar");
-  const [data, setData] = useState<Holding[]>([]);
+  const { fromDate, toDate } = useDateRange();
 
-  useEffect(() => {
-    setData(generateHoldings(range));
-  }, [range]);
+  const hasValidDates =
+    fromDate instanceof Date &&
+    !isNaN(fromDate.getTime()) &&
+    toDate instanceof Date &&
+    !isNaN(toDate.getTime());
 
-  const toggleChartType = () => {
-    setChartType((prev) => (prev === "bar" ? "line" : "bar"));
-  };
+  const data = useMemo(() => {
+    if (!hasValidDates) return [];
+    return getHoldingsInRange(fromDate, toDate);
+  }, [fromDate, toDate, hasValidDates]);
 
-  const chartOptions = {
-    chart: { type: chartType },
-    xaxis: { categories: data.map((d) => d.month) },
-    stroke: { curve: "smooth" },
-    markers: { size: chartType === "line" ? 5 : 0 }
-  };
-
-  const chartSeries = [
-    {
-      name: "Holdings",
-      data: data.map((d) => d.value)
-    }
-  ];
+  const categories = data.map((entry) => entry.month);
+  const values = data.map((entry) => entry.value);
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex justify-between items-center">
-          <CardTitle>Holdings Over Time</CardTitle>
-          <button onClick={toggleChartType}>
-            {chartType === "bar" ? (
-              <LineChart className="w-5 h-5 text-blue-500" />
-            ) : (
-              <BarChart className="w-5 h-5 text-green-600" />
-            )}
-          </button>
-        </div>
+    <Card className="w-full h-full">
+      <CardHeader className="flex flex-row items-center justify-between border-b pb-2">
+        <CardTitle>Holdings Over Time</CardTitle>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setChartType(chartType === "bar" ? "line" : "bar")}
+        >
+          {chartType === "bar" ? (
+            <LineChart className="h-4 w-4 text-muted-foreground" />
+          ) : (
+            <BarChart className="h-4 w-4 text-muted-foreground" />
+          )}
+        </Button>
       </CardHeader>
-      <CardContent>
-        <ApexChart options={chartOptions} series={chartSeries} type={chartType} height={250} />
+      <CardContent className="pb-4">
+        <div className="w-full overflow-x-auto">
+          <ApexChart
+            type={chartType}
+            height={300}
+            options={{
+              chart: { toolbar: { show: false }, animations: { easing: "easeInOut", speed: 500 } },
+              xaxis: { categories },
+              stroke: { curve: "smooth" },
+              markers: { size: chartType === "line" ? 4 : 0 }
+            }}
+            series={[{ name: "Holdings", data: values }]}
+          />
+        </div>
+        <p className="text-muted-foreground text-sm mt-4">
+          {hasValidDates
+            ? `Showing data from ${formatDate(fromDate)} to ${formatDate(toDate)}`
+            : "No data available for the selected range."}
+        </p>
       </CardContent>
     </Card>
   );
