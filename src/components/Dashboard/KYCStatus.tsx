@@ -1,9 +1,11 @@
 "use client";
 
+import type { JSX } from "react";
 import { useEffect, useState } from "react";
 import { getKYCInfo } from "@/lib/data";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/UI/Card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { CheckCircle2, Clock, XCircle } from "lucide-react";
+import { cn } from "@/utils/helpers";
 
 export default function KYCStatus(): JSX.Element {
   const [status, setStatus] = useState<"Verified" | "Pending" | "Rejected">("Pending");
@@ -34,8 +36,8 @@ export default function KYCStatus(): JSX.Element {
         {statusIcon}
       </CardHeader>
       <CardContent className="space-y-2 text-sm">
-        <div className={`text-2xl font-semibold ${color}`}>{status}</div>
-        <div className="text-xs text-gray-500">Last updated: May 30, 2025 at 11:18 AM</div>
+        <div className={cn("text-3xl font-semibold", color)}>{status}</div>
+        <div className="text-sm text-gray-500">Last updated: May 30, 2025 at 11:18 AM</div>
       </CardContent>
     </Card>
   );
