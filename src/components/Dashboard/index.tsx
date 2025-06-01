@@ -1,5 +1,6 @@
 "use client";
 
+import type { JSX } from "react";
 import { motion } from "framer-motion";
 import AccountSummary from "./AccountSummary";
 import TradeSummary from "./TradeSummary";
@@ -9,7 +10,6 @@ import RecentTransactions from "./RecentTransactions";
 import TitleBar from "./TitleBar";
 
 export default function Dashboard(): JSX.Element {
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -18,9 +18,9 @@ export default function Dashboard(): JSX.Element {
       className="space-y-6"
     >
       <TitleBar />
-      
+
       {/* Two columns at mobile and higher */}
-     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <AccountSummary />
         <TradeSummary />
         <KYCStatus />

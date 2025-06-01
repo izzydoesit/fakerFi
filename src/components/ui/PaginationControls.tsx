@@ -1,5 +1,7 @@
 "use client";
 
+import type { JSX } from "react";
+
 interface Props {
   currentPage: number;
   totalPages: number;
