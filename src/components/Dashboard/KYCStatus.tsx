@@ -24,6 +24,7 @@ export default function KYCStatus(): JSX.Element {
         <CardTitle className="text-base font-medium text-gray-600">KYC Status</CardTitle>
         {statusIcon}
       </CardHeader>
+
       <CardContent className="text-sm text-gray-800">
         <span>{status}</span>
       </CardContent>
