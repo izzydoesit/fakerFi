@@ -69,7 +69,7 @@ export default function HoldingsChart(): JSX.Element {
         <CardTitle className="text-base font-medium text-gray-600">Holdings Over Time</CardTitle>
         <button
           onClick={toggleChartType}
-          className="text-xs px-2 py-1 border rounded text-pink-500 hover:bg-pink-50 flex items-center gap-1"
+          className="text-xs px-2 py-1 border rounded text-gray-600 hover:bg-gray-50 flex items-center gap-1"
         >
           {chartType === "bar" ? <LineIcon className="w-4 h-4" /> : <BarIcon className="w-4 h-4" />}
           Toggle to {chartType === "bar" ? "Line" : "Bar"}
