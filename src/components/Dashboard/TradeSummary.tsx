@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Activity } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { generateTrades, Trade } from "@/lib/data";
 
@@ -17,7 +18,10 @@ export default function TradeSummary(): JSX.Element {
   return (
     <Card className="col-span-1 p-4">
       <CardHeader>
-        <CardTitle className="text-base font-medium text-gray-600">Trade Activity</CardTitle>
+        <div className="flex justify-between items-center">
+          <CardTitle>Trade Activity</CardTitle>
+          <Activity className="w-5 h-5 text-indigo-500" />
+        </div>
       </CardHeader>
 
       <CardContent className="space-y-2 text-sm">
