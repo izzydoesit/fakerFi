@@ -93,7 +93,7 @@ export default function RecentTransactions(): JSX.Element {
   );
 
   return (
-    <Card className="col-span-1">
+    <Card className="col-span-1" scrollable>
       <CardHeader className="sticky top-0 z-10 bg-white dark:bg-black">
         <div className="flex justify-between items-center">
           <CardTitle>Recent Transactions</CardTitle>
@@ -138,13 +138,18 @@ export default function RecentTransactions(): JSX.Element {
       </CardHeader>
 
       <CardContent className="pb-20">
-        <ul className="space-y-1 min-h-[12rem]">
-          <AnimatePresence mode="wait" initial={false}>
-            {paginated.map((trade) => (
-              <TransactionItem key={trade.id} trade={trade} isCardView={view === "card"} />
-            ))}
-          </AnimatePresence>
-        </ul>
+        <div className="relative">
+          <ul className="space-y-1 max-h-[260px] overflow-y-auto pr-2">
+            <AnimatePresence mode="wait" initial={false}>
+              {paginated.map((trade) => (
+                <TransactionItem key={trade.id} trade={trade} isCardView={view === "card"} />
+              ))}
+            </AnimatePresence>
+          </ul>
+
+          {/* Fade gradient at the bottom */}
+          <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-white dark:from-black to-transparent" />
+        </div>
 
         <div className="sticky bottom-0 z-10 bg-white dark:bg-black p-3 border-t">
           <button
