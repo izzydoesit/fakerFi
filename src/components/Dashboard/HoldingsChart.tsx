@@ -13,7 +13,6 @@ export default function HoldingsChart(): JSX.Element {
   const [chartType, setChartType] = useState<"bar" | "line">("bar");
 
   const holdings: Holding[] = generateHoldings();
-
   const categories = holdings.map((h) => h.month);
   const values = holdings.map((h) => h.value);
 
@@ -23,7 +22,7 @@ export default function HoldingsChart(): JSX.Element {
       toolbar: { show: false },
       animations: {
         easing: "easeinout",
-        speed: 400
+        speed: 600
       }
     },
     xaxis: {
@@ -34,9 +33,23 @@ export default function HoldingsChart(): JSX.Element {
       labels: { style: { colors: "#888" } }
     },
     stroke: {
-      curve: "smooth"
+      curve: "smooth",
+      width: 3
     },
-    colors: ["#4f46e5"]
+    markers: {
+      size: chartType === "line" ? 5 : 0,
+      colors: ["#f472b6"], // Tailwind pink-400
+      strokeColors: "#fff",
+      strokeWidth: 2
+    },
+    colors: ["#6366f1"], // Tailwind indigo-500
+    dataLabels: {
+      enabled: false
+    },
+    grid: {
+      borderColor: "#e5e7eb",
+      strokeDashArray: 4
+    }
   };
 
   const series = [
@@ -56,7 +69,7 @@ export default function HoldingsChart(): JSX.Element {
         <CardTitle className="text-base font-medium text-gray-600">Holdings Over Time</CardTitle>
         <button
           onClick={toggleChartType}
-          className="text-xs px-2 py-1 border rounded text-gray-500 hover:bg-gray-100 flex items-center gap-1"
+          className="text-xs px-2 py-1 border rounded text-pink-500 hover:bg-pink-50 flex items-center gap-1"
         >
           {chartType === "bar" ? <LineIcon className="w-4 h-4" /> : <BarIcon className="w-4 h-4" />}
           Toggle to {chartType === "bar" ? "Line" : "Bar"}
