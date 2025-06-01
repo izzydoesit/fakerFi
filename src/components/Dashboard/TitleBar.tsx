@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import { useRef, useState } from "react";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
+import "@/styles/shimmer.css";
 
 export default function TitleBar(): JSX.Element {
   const [range, setRange] = useState<{ from?: Date; to?: Date }>({
@@ -21,8 +22,8 @@ export default function TitleBar(): JSX.Element {
       : "Select range";
 
   return (
-    <div className="flex justify-between items-center py-4 relative">
-      <h1 className="text-2xl font-bold text-gray-800">FakerFi Crypto Dashboard</h1>
+    <div className="flex justify-between items-center py-4">
+      <h1 className="text-2xl font-bold text-gray-800 shimmer-effect">FakerFi Crypto Dashboard</h1>
 
       <div className="flex gap-3 items-center">
         {/* DATE RANGE PICKER */}
