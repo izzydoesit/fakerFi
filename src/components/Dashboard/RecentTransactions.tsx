@@ -1,176 +1,117 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { generateTrades, Trade } from "@/lib/data";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/UI/Card";
-import { ArrowDownRight, ArrowUpRight, List, Table } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-
-type TradeFilter = "all" | "buy" | "sell";
-type ViewMode = "card" | "table";
-
-interface TransactionItemProps {
-  trade: Trade;
-  isCardView: boolean;
-}
-
-function TransactionItem({ trade, isCardView }: TransactionItemProps): JSX.Element {
-  const isBuy = trade.type === "buy";
-  const Icon = isBuy ? ArrowUpRight : ArrowDownRight;
-
-  return (
-    <motion.li
-      initial={{ opacity: 0, x: -10 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 10 }}
-      transition={{ duration: 0.2 }}
-      className={`${
-        isCardView
-          ? "flex justify-between items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-          : "grid grid-cols-4 gap-4 px-3 py-2 text-sm border-b border-gray-200 dark:border-gray-700"
-      }`}
-    >
-      {isCardView ? (
-        <>
-          <div className="flex items-center gap-3">
-            <Icon className={`w-5 h-5 ${isBuy ? "text-green-500" : "text-red-500"}`} />
-            <div>
-              <div className="font-medium flex items-center gap-2">
-                <span
-                  className={`text-xs px-2 py-0.5 rounded-full ${
-                    isBuy ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-                  }`}
-                >
-                  {trade.type.toUpperCase()}
-                </span>
-                {trade.asset}
-              </div>
-              <div className="text-xs text-gray-500">
-                {new Date(trade.date).toLocaleString()}
-              </div>
-            </div>
-          </div>
-          <div className="text-sm font-semibold">${trade.amount.toFixed(2)}</div>
-        </>
-      ) : (
-        <>
-          <div className="font-semibold">{trade.asset}</div>
-          <div
-            className={`font-medium ${
-              isBuy ? "text-green-600" : "text-red-600"
-            }`}
-          >
-            {trade.type.toUpperCase()}
-          </div>
-          <div className="text-sm">${trade.amount.toFixed(2)}</div>
-          <div className="text-xs text-gray-500">{new Date(trade.date).toLocaleString()}</div>
-        </>
-      )}
-    </motion.li>
-  );
-}
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/UI/Card";
+import { motion } from "framer-motion";
+import { ArrowDown, ArrowUp, Table, LayoutGrid } from "lucide-react";
+import { formatDistanceToNowStrict } from "date-fns";
 
 export default function RecentTransactions(): JSX.Element {
-  const [trades, setTrades] = useState<Trade[]>([]);
-  const [page, setPage] = useState(0);
-  const [filter, setFilter] = useState<TradeFilter>("all");
-  const [view, setView] = useState<ViewMode>("card");
+  const [view, setView] = useState<"table" | "card">("card");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
 
-  const PAGE_SIZE = 5;
+  const pageSize = 10;
+  const trades: Trade[] = useMemo(() => generateTrades(40), []);
+  const totalPages = Math.ceil(trades.length / pageSize);
+  const paginatedTrades = trades.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   useEffect(() => {
-    setTrades(generateTrades(20));
-  }, []);
+    setLastUpdated(new Date());
+  }, [currentPage, view]);
 
-  const filteredTrades = trades.filter((trade) =>
-    filter === "all" ? true : trade.type === filter
-  );
+  const renderTrade = (trade: Trade) => {
+    const Icon = trade.type === "buy" ? ArrowUp : ArrowDown;
+    const color = trade.type === "buy" ? "text-green-500" : "text-red-500";
 
-  const totalPages = Math.ceil(filteredTrades.length / PAGE_SIZE);
-  const paginated = filteredTrades.slice(
-    page * PAGE_SIZE,
-    page * PAGE_SIZE + PAGE_SIZE
-  );
+    return (
+      <motion.div
+        key={trade.id}
+        className="flex items-center justify-between border-b pb-2 mb-2"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.2 }}
+      >
+        <div className="flex items-center gap-2">
+          <Icon className={`w-4 h-4 ${color}`} />
+          <span className="text-sm font-medium">{trade.asset}</span>
+        </div>
+        <div className="text-sm text-gray-600">${trade.amount.toFixed(2)}</div>
+      </motion.div>
+    );
+  };
 
   return (
-    <Card className="col-span-1" scrollable>
-      <CardHeader className="sticky top-0 z-10 bg-white dark:bg-black">
-        <div className="flex justify-between items-center">
-          <CardTitle>Recent Transactions</CardTitle>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setView("card")}
-              className={`p-1 rounded ${
-                view === "card" ? "bg-blue-100 text-blue-600" : "hover:text-blue-600"
-              }`}
-            >
-              <List className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => setView("table")}
-              className={`p-1 rounded ${
-                view === "table" ? "bg-blue-100 text-blue-600" : "hover:text-blue-600"
-              }`}
-            >
-              <Table className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-
+    <Card className="p-4 h-[500px] flex flex-col justify-between">
+      <CardHeader className="flex items-center justify-between">
+        <CardTitle className="text-base font-medium text-gray-600">Recent Transactions</CardTitle>
         <div className="flex gap-2">
-          {["all", "buy", "sell"].map((type) => (
-            <button
-              key={type}
-              onClick={() => {
-                setFilter(type as TradeFilter);
-                setPage(0);
-              }}
-              className={`text-xs px-3 py-1 rounded-full border ${
-                filter === type
-                  ? "bg-blue-600 text-white"
-                  : "bg-white dark:bg-black text-gray-700 dark:text-gray-300"
-              }`}
-            >
-              {type.toUpperCase()}
-            </button>
-          ))}
+          <button
+            onClick={() => setView("card")}
+            className={`text-xs px-2 py-1 border rounded ${view === "card" ? "bg-gray-200" : "text-gray-500"}`}
+          >
+            <LayoutGrid className="w-4 h-4 inline-block mr-1" />
+            Card
+          </button>
+          <button
+            onClick={() => setView("table")}
+            className={`text-xs px-2 py-1 border rounded ${view === "table" ? "bg-gray-200" : "text-gray-500"}`}
+          >
+            <Table className="w-4 h-4 inline-block mr-1" />
+            Table
+          </button>
         </div>
       </CardHeader>
 
-      <CardContent className="pb-20">
-        <div className="relative">
-          <ul className="space-y-1 max-h-[260px] overflow-y-auto pr-2">
-            <AnimatePresence mode="wait" initial={false}>
-              {paginated.map((trade) => (
-                <TransactionItem key={trade.id} trade={trade} isCardView={view === "card"} />
+      <CardContent className="flex-1 overflow-y-auto pr-1 max-h-[380px]">
+        {view === "card" ? (
+          <div>{paginatedTrades.map(renderTrade)}</div>
+        ) : (
+          <table className="w-full text-sm text-left border-t">
+            <thead>
+              <tr>
+                <th className="py-1 text-gray-500">Asset</th>
+                <th className="py-1 text-gray-500">Type</th>
+                <th className="py-1 text-gray-500">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedTrades.map((trade) => (
+                <tr key={trade.id} className="border-t">
+                  <td className="py-1">{trade.asset}</td>
+                  <td className="py-1 capitalize">{trade.type}</td>
+                  <td className="py-1">${trade.amount.toFixed(2)}</td>
+                </tr>
               ))}
-            </AnimatePresence>
-          </ul>
-
-          {/* Fade gradient at the bottom */}
-          <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-white dark:from-black to-transparent" />
-        </div>
-
-        <div className="sticky bottom-0 z-10 bg-white dark:bg-black p-3 border-t">
-          <button
-            onClick={() => setPage((p) => Math.max(p - 1, 0))}
-            disabled={page === 0}
-            className="text-sm px-3 py-1 rounded bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 disabled:opacity-50 transition"
-          >
-            Previous
-          </button>
-          <span className="text-xs text-gray-500">
-            Page {page + 1} of {totalPages}
-          </span>
-          <button
-            onClick={() => setPage((p) => Math.min(p + 1, totalPages - 1))}
-            disabled={page === totalPages - 1}
-            className="text-sm px-3 py-1 rounded bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 disabled:opacity-50 transition"
-          >
-            Next
-          </button>
-        </div>
+            </tbody>
+          </table>
+        )}
       </CardContent>
+
+      <div className="text-xs text-gray-400 mt-2">
+        Last updated: {formatDistanceToNowStrict(lastUpdated)} ago
+      </div>
+
+      <div className="mt-2 flex justify-between items-center pt-2 border-t pt-3">
+        <button
+          className="text-xs text-blue-500 disabled:text-gray-300"
+          onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+          disabled={currentPage === 1}
+        >
+          Previous
+        </button>
+        <span className="text-xs text-gray-500">
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          className="text-xs text-blue-500 disabled:text-gray-300"
+          onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+          disabled={currentPage === totalPages}
+        >
+          Next
+        </button>
+      </div>
     </Card>
   );
 }
