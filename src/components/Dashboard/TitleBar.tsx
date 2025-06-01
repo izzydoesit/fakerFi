@@ -5,14 +5,11 @@ import { format } from "date-fns";
 import { useRef, useState } from "react";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
-import "@/styles/shimmer.css";
+import { useDateRange } from "@/context/DateRangeContext";
+import "@/styles/shimmer.css"; // Make sure this file exists with shimmer effect styles
 
 export default function TitleBar(): JSX.Element {
-  const [range, setRange] = useState<{ from?: Date; to?: Date }>({
-    from: new Date(2025, 0, 1),
-    to: new Date(2025, 2, 30)
-  });
-
+  const { range, setRange } = useDateRange();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
 
@@ -43,7 +40,7 @@ export default function TitleBar(): JSX.Element {
                 selected={range}
                 onSelect={(r) => {
                   if (r?.from && r?.to) setOpen(false);
-                  setRange(r || {});
+                  setRange(r as { from: Date; to: Date });
                 }}
                 numberOfMonths={2}
               />
