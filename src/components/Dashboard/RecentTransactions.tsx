@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  CreditCard,
   DollarSign,
   IndianRupee,
   LayoutGrid,
@@ -15,6 +14,9 @@ import { Card, CardContent, CardHeader } from "../ui/Card";
 import PaginationControls from "../ui/PaginationControls";
 import { useDateRange } from "@/context/DateRangeContext";
 import { motion } from "framer-motion";
+import { usePagination } from "@/hooks/usePagination";
+
+const PAGE_SIZE = 10;
 
 const iconMap: Record<Trade["type"], JSX.Element> = {
   buy: <DollarSign className="w-4 h-4 text-green-500" />,
@@ -25,11 +27,9 @@ export default function RecentTransactions(): JSX.Element {
   const { range } = useDateRange();
   const [layout, setLayout] = useState<"grid" | "table">("grid");
   const [filter, setFilter] = useState<"all" | "buy" | "sell">("all");
-  const [page, setPage] = useState(1);
-  const pageSize = 10;
 
   const allTrades = useMemo(
-    () => generateTrades(20, range.from, range.to),
+    () => generateTrades(30, range.from, range.to),
     [range.from, range.to]
   );
 
@@ -37,14 +37,17 @@ export default function RecentTransactions(): JSX.Element {
     (t) => filter === "all" || t.type === filter
   );
 
-  const paginatedTrades = filteredTrades.slice(
-    (page - 1) * pageSize,
-    page * pageSize
-  );
+  const {
+    currentPageItems: paginatedTrades,
+    currentPage,
+    totalPages,
+    setPage,
+  } = usePagination(filteredTrades, PAGE_SIZE);
 
   return (
-    <Card className="max-h-[500px] overflow-auto relative">
-      <CardHeader>
+    <Card className="relative h-[500px] flex flex-col">
+      {/* Sticky Header */}
+      <CardHeader className="sticky top-0 bg-white z-10 border-b">
         <div className="flex justify-between items-center w-full">
           <div className="text-xl font-semibold">Recent Transactions</div>
           <div className="flex items-center gap-2 ml-auto">
@@ -66,26 +69,29 @@ export default function RecentTransactions(): JSX.Element {
             </button>
           </div>
         </div>
+
+        <div className="flex items-center justify-end my-2">
+          <div className="flex gap-2">
+            {["all", "buy", "sell"].map((f) => (
+              <button
+                key={f}
+                onClick={() => {
+                  setFilter(f as "all" | "buy" | "sell");
+                  setPage(1);
+                }}
+                className={`text-sm px-3 py-1 rounded border ${
+                  filter === f ? "bg-black text-white" : "text-gray-600"
+                }`}
+              >
+                {f[0].toUpperCase() + f.slice(1)}
+              </button>
+            ))}
+          </div>
+        </div>
       </CardHeader>
 
-      <CardContent className="space-y-3">
-        <div className="flex justify-end gap-2 mb-2">
-          {["all", "buy", "sell"].map((f) => (
-            <button
-              key={f}
-              onClick={() => {
-                setFilter(f as "all" | "buy" | "sell");
-                setPage(1);
-              }}
-              className={`text-sm px-3 py-1 rounded border ${
-                filter === f ? "bg-black text-white" : "text-gray-600"
-              }`}
-            >
-              {f[0].toUpperCase() + f.slice(1)}
-            </button>
-          ))}
-        </div>
-
+      {/* Scrollable Content Area */}
+      <div className="flex-1 overflow-y-auto space-y-3 px-4 py-2">
         {paginatedTrades.length > 0 ? (
           paginatedTrades.map((trade) => (
             <motion.div
@@ -112,15 +118,17 @@ export default function RecentTransactions(): JSX.Element {
         ) : (
           <div className="text-gray-500 text-sm text-center">No trades found</div>
         )}
+      </div>
 
-        {filteredTrades.length > pageSize && (
+      {/* Sticky Footer */}
+      <CardContent className="sticky bottom-0 bg-white z-10 border-t mt-auto pt-2">
+        {filteredTrades.length > PAGE_SIZE && (
           <PaginationControls
-            currentPage={page}
-            totalPages={Math.ceil(filteredTrades.length / pageSize)}
+            currentPage={currentPage}
+            totalPages={totalPages}
             onPageChange={setPage}
           />
         )}
-
         <div className="text-xs text-gray-400 text-right mt-2">
           Last updated: just now
         </div>
