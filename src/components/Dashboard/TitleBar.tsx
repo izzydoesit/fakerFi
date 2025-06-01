@@ -6,7 +6,8 @@ import { useRef, useState } from "react";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import { useDateRange } from "@/context/DateRangeContext";
-import "@/styles/shimmer.css"; // Make sure this file exists with shimmer effect styles
+import { generateTrades } from "@/lib/data";
+import "@/styles/shimmer.css";
 
 export default function TitleBar(): JSX.Element {
   const { range, setRange } = useDateRange();
@@ -52,11 +53,17 @@ export default function TitleBar(): JSX.Element {
         <button
           className="flex items-center gap-2 text-sm bg-black text-white px-4 py-1.5 rounded hover:bg-gray-900"
           onClick={() => {
-            const csv = "Asset,Type,Amount\nBTC,Buy,1200\nETH,Sell,900";
+            const trades = generateTrades(30).filter((t) => {
+              const date = new Date(t.date);
+              return date >= range.from && date <= range.to;
+            });
+            const header = "Asset,Type,Amount,Date";
+            const rows = trades.map((t) => [t.asset, t.type, t.amount, t.date].join(","));
+            const csv = [header, ...rows].join("\n");
             const blob = new Blob([csv], { type: "text/csv" });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = "trades.csv";
+            link.download = "filtered_trades.csv";
             link.click();
           }}
         >
