@@ -17,7 +17,7 @@ export default function Dashboard(): JSX.Element {
       className="space-y-6"
     >
       {/* Two columns at mobile and higher */}
-     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <AccountSummary />
         <TradeSummary />
         <KYCStatus />
