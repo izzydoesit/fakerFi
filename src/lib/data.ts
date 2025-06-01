@@ -2,7 +2,10 @@ import { faker } from "@faker-js/faker";
 import { addDays, isAfter, isBefore } from "date-fns";
 import { Trade, Holding, KYCInfo } from "./types";
 
-export const getBalance = (): number => parseFloat(faker.finance.amount(10000, 50000));
+export const getBalance = (): number =>
+  parseFloat(faker.finance.amount({ min: 20000, max: 50000, autoFormat: false }));
+
+export const getPercentChange = (): number => Math.round(Math.random() * 100 - 50); // simulate -50% to +50%
 
 export const generateTrades = (count = 50, from?: Date, to?: Date): Trade[] =>
   Array.from({ length: count }, (): Trade => {
@@ -14,7 +17,7 @@ export const generateTrades = (count = 50, from?: Date, to?: Date): Trade[] =>
       id: faker.string.uuid(),
       type: faker.helpers.arrayElement(["buy", "sell"]),
       asset: faker.finance.currencyCode(),
-      amount: parseFloat(faker.finance.amount(10, 1000)),
+      amount: parseFloat(faker.finance.amount({ min: 10, max: 1000, autoFormat: false })),
       date: date.toISOString()
     };
   });
