@@ -7,7 +7,7 @@ import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import { useDateRange } from "@/context/DateRangeContext";
 import { generateTrades } from "@/lib/data";
-import "@/styles/shimmer.css";
+import { motion } from "framer-motion";
 
 export default function TitleBar(): JSX.Element {
   const { range, setRange } = useDateRange();
@@ -21,7 +21,18 @@ export default function TitleBar(): JSX.Element {
 
   return (
     <div className="flex justify-between items-center py-4">
-      <h1 className="text-2xl font-bold text-gray-800 shimmer-effect">FakerFi Crypto Dashboard</h1>
+      <motion.h1
+        className="text-2xl font-bold tracking-tight text-gray-900"
+        initial={{ x: 50, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{
+          type: "spring",
+          stiffness: 60,
+          damping: 12
+        }}
+      >
+        FakerFi Crypto Dashboard
+      </motion.h1>
 
       <div className="flex gap-3 items-center">
         {/* DATE RANGE PICKER */}
