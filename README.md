@@ -10,7 +10,7 @@
 ![Build](https://img.shields.io/github/actions/workflow/status/izzydoesit/fakerfi/ci.yml?branch=main)
 ![Code Quality](https://img.shields.io/codeclimate/maintainability/izzydoesit/fakerfi)
 
-A mock crypto dashboard built for InvestiFi’s coding challenge. Built with **Next.js**, **React**, **Tailwind CSS**, **shadcn/ui**, and **faker.js** for fake but realistic data. Deployed via **Vercel**.
+A mock crypto dashboard built for the love of dashboards. Built with **Next.js**, **React**, **Tailwind CSS**, **shadcn/ui**, and **faker.js** for fake but realistic data. Deployed via **Vercel**.
 
 ## 🖼️ Preview
 
@@ -133,4 +133,4 @@ Given more time, here are a few improvements that could be implemented:
 
 ## 🧠 Author
 
-**Israel Matos:** [GitHub](https://github.com/izzydoesit) | [LinkedIn](<(https://linkedin.com/in/izzy-matos)>)
+**Israel Matos:** [GitHub](https://github.com/izzydoesit) | [LinkedIn](https://linkedin.com/in/izzy-matos)
